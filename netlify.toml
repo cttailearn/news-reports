@@ -1,0 +1,16 @@
+[build]
+command = "echo 'No build needed - static files'"
+publish = "reports"
+
+[site]
+dir = "reports"
+
+[[redirects]]
+from = "/"
+to = "/news/latest.html"
+status = 302
+
+[[redirects]]
+from = "/news"
+to = "/news_index.html"
+status = 302

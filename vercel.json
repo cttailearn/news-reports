@@ -1,0 +1,9 @@
+version: 2
+builds:
+  - src: reports/news/*.html
+    use: @cloudflare/pages
+routes:
+  - src: /
+    dest: /news/latest.html
+  - src: /news
+    dest: /news_index.html
