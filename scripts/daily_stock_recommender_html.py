@@ -8,9 +8,14 @@ import json
 import akshare as ak
 from datetime import datetime, timedelta
 from pathlib import Path
+import requests
 
 OUTPUT_DIR = Path("/root/.openclaw/workspace/reports")
 OUTPUT_DIR.mkdir(exist_ok=True)
+
+# Feishu 推送配置
+FEISHU_WEBHOOK = "https://open.feishu.cn/open-apis/bot/v2/hook/DEFAULT"  # 需要替换为实际 webhook
+USE_FEISHU_PUSH = True  # 设置为 True 启用推送
 
 def get_trade_date():
     try:
@@ -204,13 +209,46 @@ def generate_html(stocks, date):
     
     return html
 
+def send_feishu_message(news_url, stock_url, date_str):
+    """发送 Feishu 消息推送"""
+    try:
+        # 使用 openclaw message 工具发送（通过 subprocess 调用）
+        import subprocess
+        
+        today = datetime.now().strftime("%Y-%m-%d")
+        message = f"""📰 **每日简报 - {today}**
+
+🗞️ **重大新闻**：{news_url}
+
+📈 **股票推荐**：{stock_url}
+
+---
+_自动生成 | 工作日 9:00 更新_"""
+        
+        # 通过 openclaw message 工具发送
+        result = subprocess.run(
+            ["openclaw", "message", "send", "--target", "ou_10ffc60c948cf2313f4eb6b0241cf2ed", "--message", message],
+            capture_output=True, text=True, timeout=30
+        )
+        
+        if result.returncode == 0:
+            print(f"✅ Feishu 消息推送成功")
+        else:
+            print(f"⚠️ Feishu 推送失败：{result.stderr}")
+            
+    except Exception as e:
+        print(f"⚠️ 消息推送异常：{e}")
+
+
 def main():
     print("=" * 50)
     print("A 股股票推荐 - 连板股 + 趋势股组合")
     print("=" * 50)
     
-    date = get_trade_date()
-    print(f"数据日期：{date}")
+    # 使用当前日期作为文件名（确保每天生成新文件）
+    today = datetime.now().strftime("%Y%m%d")
+    date = get_trade_date()  # 数据仍使用交易日数据
+    print(f"数据日期：{date} | 文件日期：{today}")
     
     # 获取连板股
     print("获取连板股...")
@@ -232,7 +270,8 @@ def main():
     print("生成 HTML 报告...")
     html = generate_html(stocks, date)
     
-    html_file = OUTPUT_DIR / f"stock_rec_{date}.html"
+    # 使用今天日期作为文件名（避免 404）
+    html_file = OUTPUT_DIR / f"stock_rec_{today}.html"
     html_file.write_text(html, encoding='utf-8')
     
     latest = OUTPUT_DIR / "stock_rec_latest.html"
@@ -240,8 +279,11 @@ def main():
         latest.unlink()
     latest.symlink_to(html_file.name)
     
+    stock_url = f"https://cttailearn.github.io/news-reports/reports/stock_rec_{today}.html"
     print(f"✅ HTML 报告已保存：{html_file}")
-    print(f"🔗 URL: https://cttailearn.github.io/news-reports/reports/stock_rec_{date}.html")
+    print(f"🔗 URL: {stock_url}")
+    
+    return stock_url
 
 if __name__ == "__main__":
-    main()
+    stock_url = main()
