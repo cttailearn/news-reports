@@ -27,3 +27,12 @@ Thumbs.db
 # 临时文件
 *.tmp
 *.bak
+
+# Nested git repos - should not be in this repo
+OpenClaw-bot-review/
+file-dedup-tool/
+.clawhub/
+.openclaw/
+skills/
+memory/
+.learnings/
