@@ -66,6 +66,12 @@
       "zip_url": "https://lightmake.site/api/v1/download?slug=yahoo-finance",
       "source": "skillhub",
       "version": "1.0.0"
+    },
+    "multi-agent-builder": {
+      "name": "Multi Agent Builder",
+      "zip_url": "https://lightmake.site/api/v1/download?slug=multi-agent-builder",
+      "source": "skillhub",
+      "version": "1.0.0"
     }
   }
 }

@@ -84,6 +84,10 @@
     "yahoo-finance": {
       "version": "1.0.0",
       "installedAt": 1773718872455
+    },
+    "multi-agent-builder": {
+      "version": "1.0.0",
+      "installedAt": 1773997918235
     }
   }
 }
